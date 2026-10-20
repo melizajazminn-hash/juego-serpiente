@@ -237,5 +237,67 @@ function solicitarCredito() {
     pintarCreditos(creditos);
 }
 
+// LISTAR CRÉDITOS EN LA TABLA FINAL
+function pintarCreditos(arregloCreditos) {
+    let tbody = document.getElementById("tablaCreditos");
+    if (!tbody) return;
+
+    let contenido = "";
+    for (let i = 0; i < arregloCreditos.length; i++) {
+        let cr = arregloCreditos[i];
+        contenido += "<tr>" +
+            "<td>" + cr.cedula + "</td>" +
+            "<td>" + cr.nombre + "</td>" +
+            "<td>" + cr.apellido + "</td>" +
+            "<td>$" + cr.monto + "</td>" +
+            "<td>" + cr.tasa + "%</td>" +
+            "<td>" + cr.plazo + " meses</td>" +
+            "<td>$" + cr.cuota + "</td>" +
+        "</tr>";
+    }
+    tbody.innerHTML = contenido;
+}
+
+// FILTRAR CRÉDITOS POR CÉDULA
+function buscarCreditosCliente() {
+    let cedulaBuscar = recuperaraTexto("buscarCedulaListado");
+    if (cedulaBuscar.trim() === "") {
+        alert("Ingrese una cédula para filtrar.");
+        return;
+    }
+    let filtrados = creditos.filter(c => c.cedula === cedulaBuscar);
+    pintarCreditos(filtrados);
+}
+
+function calcularDisponible(ingresos, egresos) {
+    return ingresos - egresos;
+}
+
+function calcularCapacidadDePgo(disponible) {
+    // Límite financiero estándar del 40% sobre el saldo neto disponible
+    return disponible * 0.40;
+}
+
+function calcularInteresSimple(monto, plazoMeses, tasaAnual) {
+    let tasaMensual = (tasaAnual / 100) / 12;
+    return monto * tasaMensual * plazoMeses;
+}
+
+function calcularTotalPagar(monto, interes) {
+    return monto + interes;
+}
+
+function calcularCuotaMensual(totalPagar, plazoMeses) {
+    if (plazoMeses <= 0) return 0;
+    return totalPagar / plazoMeses;
+}
+
+function aprobarCredito(capacidadPago, cuotaCalculada) {
+    // El crédito es viable si la cuota mensual no supera la capacidad máxima de pago
+    if (cuotaCalculada <= capacidadPago && capacidadPago > 0) {
+        return true;
+    }
+    return false;
+}
 
 
