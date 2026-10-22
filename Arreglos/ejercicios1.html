@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es"> 
+    <head>
+        <meta charset="UTF-8">
+        <title>Control de Notas</title>
+        
+        <script src="ejercicio1.js"></script>
+        <script src="utilitarios.js"></script>
+    </head>
+    <body>
+    
+        <input type="text" id="txtNota" placeholder="Ingresa una nota"/>
+        
+        <input type="button" value="AGREGAR NOTA" onclick="probarAgregar();"/>
+        <input type="button" value="PRUEBA 1" onclick="agregarElemento();"/>
+        <input type="button" value="IMPRIMIR" onclick="recorrerArreglo();"/>
+        <input type="button" value="CALCULAR PROMEDIO" onclick="mostrarResultado();"/>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>CABECERA1</th>
+                    <th>CABECERA2</th>
+                    <th>CABECERA3</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>celda 1</td>
+                    <td>celda 2</td>
+                    <td>celda 3</td>
+                </tr>
+                <tr>
+                    <td>celda 4</td>
+                    <td>celda 5</td>
+                    <td>celda 6</td>
+                </tr>
+                <tr>
+                    <td>celda 7</td>
+                    <td>celda 8</td>
+                    <td>celda 9</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <input type="button" value="GENERAR TABLA" onclick="generarTabla();"/>
+        <input type="button" value="MOSTRAR NOTA" onclick="mostrarNotas();"/>
+        
+        <div id="divTabla">
+            <table>
+                <tbody>
+                    <tr><td>UNO</td></tr>
+                    <tr><td>DOS</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+    </body>
+</html>
+
+
