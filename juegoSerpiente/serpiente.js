@@ -4,7 +4,6 @@
 const canvas = document.getElementById("canvasJuego");
 const ctx = canvas.getContext("2d");
 
-// Dimensiones definitivas fijas del lienzo
 canvas.width = 600;
 canvas.height = 600;
 
@@ -16,8 +15,8 @@ const TAMANIO_CELDA = 25;
 const COLORES_NEON = {
   celeste: "#00f3ff",         // Cabeza
   azulElectrico: "#0066ff",   // Cuerpo
-  lineasCuadricula: "#101f42",// Azul intermedio visible para la cuadrícula
-  fondoNegro: "#00020a",      // Fondo oscuro del lienzo
+  lineasCuadricula: "#101f42",// Cuadrícula visible
+  fondoNegro: "#00020a",      // Fondo
   rosaNeon: "#ff007f"         // Comida
 };
 
@@ -25,17 +24,17 @@ const COLORES_NEON = {
 // 3. ESTADO INICIAL (POSICIONES LÓGICAS)
 // ==========================================
 let serpiente = [
-  { x: 5, y: 1 }, // Cabeza (Fila 1, Columna 5)
+  { x: 5, y: 1 }, // Cabeza
   { x: 4, y: 1 }, // Cuerpo
   { x: 3, y: 1 }  // Cola
 ];
 
-// Mantenemos la comida definida para evitar errores al dibujar
 let comida = { x: 10, y: 5 }; 
+let intervaloSerpiente = null; 
+let direccionActual = "derecha"; 
+let puntaje = 0;
 
-// ==========================================
-// 4. FUNCIONES DE DIBUJO (RENDERIZADO)
-// ==========================================
+// 4. FUNCIONES DE DIBUJO
 
 function limpiarCanvas() {
   ctx.fillStyle = COLORES_NEON.fondoNegro;
@@ -68,20 +67,27 @@ function pintarParte(lineaX, lineaY, color = COLORES_NEON.celeste) {
   const yReal = lineaY * TAMANIO_CELDA;
   
   ctx.fillStyle = color;
-  
   ctx.fillRect(xReal + 1, yReal + 1, TAMANIO_CELDA - 1, TAMANIO_CELDA - 1);
 }
 
-function dibujarTodo() {
-  limpiarCanvas();   // 1. Fondo negro primero
-  dibujarTablero();  // 2. Cuadrícula encima del fondo
+function reposicionarComida() {
+  const lineasVerticales = canvas.width / TAMANIO_CELDA;
+  const lineasHorizontales = canvas.height / TAMANIO_CELDA;
+  
+  comida.x = Math.floor(Math.random() * lineasVerticales);
+  comida.y = Math.floor(Math.random() * lineasHorizontales);
+}
 
+function dibujarTodo() {
+  limpiarCanvas();   
+  dibujarTablero();  
+
+  // Pintamos la comida 
   pintarParte(comida.x, comida.y, COLORES_NEON.rosaNeon);
 
-  
+  // Pintamos la serpiente 
   serpiente.forEach((parte, index) => {
     if (index === 0) {
-      
       pintarParte(parte.x, parte.y, COLORES_NEON.celeste);
     } else {
       pintarParte(parte.x, parte.y, COLORES_NEON.azulElectrico);
@@ -89,8 +95,102 @@ function dibujarTodo() {
   });
 }
 
+// 5. FUNCIONES DE MOVIMIENTO
+
+function moverDerecha() {
+  const cabezaActual = serpiente[0];
+  const nuevaCabeza = { x: cabezaActual.x + 1, y: cabezaActual.y };
+  serpiente.unshift(nuevaCabeza);
+}
+
+function moverIzquierda() {
+  const cabezaActual = serpiente[0];
+  const nuevaCabeza = { x: cabezaActual.x - 1, y: cabezaActual.y };
+  serpiente.unshift(nuevaCabeza);
+}
+
+function moverArriba() {
+  const cabezaActual = serpiente[0];
+  const nuevaCabeza = { x: cabezaActual.x, y: cabezaActual.y - 1 };
+  serpiente.unshift(nuevaCabeza);
+}
+
+function moverAbajo() {
+  const cabezaActual = serpiente[0];
+  const nuevaCabeza = { x: cabezaActual.x, y: cabezaActual.y + 1 };
+  serpiente.unshift(nuevaCabeza);
+}
+
+
+// 6. CONTROL Y LÓGICA DEL JUEGO
+
+function cambiarDireccion(direccion) {
+  direccionActual = direccion;
+}
+
+function iniciarJuego() {
+  if (!intervaloSerpiente) {
+    intervaloSerpiente = setInterval(moverSerpiente, 200); 
+    // Sincronización con tu HTML
+    document.getElementById("estado").innerText = "Jugando";
+    document.getElementById("mensaje").innerText = "¡Cuidado con las esquinas!";
+  }
+}
+
+function pausarJuego() {
+  clearInterval(intervaloSerpiente);
+  intervaloSerpiente = null; 
+  // Sincronización con  HTML
+  document.getElementById("estado").innerText = "Pausado";
+  document.getElementById("mensaje").innerText = "Juego en pausa.";
+}
+
+function atrapaComida() {
+  const cabeza = serpiente[0];
+  if (cabeza.x === comida.x && cabeza.y === comida.y) {
+    return true;
+  }
+  return false;
+}
+
+function moverSerpiente() {
+  if (direccionActual === "right" || direccionActual === "derecha") {
+    moverDerecha();
+  } else if (direccionActual === "izquierda") {
+    moverIzquierda();
+  } else if (direccionActual === "arriba") {
+    moverArriba();
+  } else if (direccionActual === "abajo") {
+    moverAbajo();
+  }
+
+
+  if (atrapaComida() === true) {
+    puntaje = puntaje + 1; 
+    document.getElementById("puntaje").innerText = puntaje; 
+    reposicionarComida(); 
+  } else {
+    serpiente.pop(); 
+  }
+
+  dibujarTodo(); 
+}
+
+function reiniciarJuego() {
+  pausarJuego();
+  serpiente = [
+    { x: 5, y: 1 },
+    { x: 4, y: 1 },
+    { x: 3, y: 1 }
+  ];
+  comida = { x: 10, y: 5 };
+  direccionActual = "derecha";
+  puntaje = 0;
+  document.getElementById("puntaje").innerText = puntaje;
+  document.getElementById("estado").innerText = "Listo";
+  document.getElementById("mensaje").innerText = "Presiona Iniciar para comenzar.";
+  dibujarTodo();
+}
+
+
 dibujarTodo();
-
-
-
-
