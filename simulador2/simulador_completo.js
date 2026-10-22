@@ -300,3 +300,4 @@ function aprobarCredito(capacidadPago, cuotaCalculada) {
     return false;
 }
 
+
